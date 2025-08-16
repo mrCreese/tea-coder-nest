@@ -1,5 +1,5 @@
 import { applyDecorators, UseGuards } from '@nestjs/common';
-import { JwtGuard } from '../auth.guard';
+import { JwtGuard } from '../guards';
 
 export function Authorization() {
   return applyDecorators(UseGuards(JwtGuard));

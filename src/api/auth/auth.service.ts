@@ -4,16 +4,15 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterRequest } from './dto/register.dto';
 import { hash, verify } from 'argon2';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import type { JwtPayload } from '../../common/interfaces/jwt.interface';
 import { LoginRequest } from './dto/login.dto';
 import type { Request, Response } from 'express';
-import { isDev } from 'src/common/utils/is-dev.utils';
-import { ApiOperation } from '@nestjs/swagger';
+import { PrismaService } from 'src/infra/prisma/prisma.service';
+import { isDev } from 'src/common/utils';
+import type { JwtPayload } from 'src/common/interfaces';
 
 @Injectable()
 export class AuthService {
@@ -35,10 +34,6 @@ export class AuthService {
     this.COOKIE_DOMAIN = configService.getOrThrow<string>('COOKIE_DOMAIN');
   }
 
-  @ApiOperation({
-    summary: 'Creazione del account',
-    description: 'Creare un nuovo account del utentes',
-  })
   async register(res: Response, dto: RegisterRequest) {
     const { name, email, password } = dto;
 
@@ -55,10 +50,6 @@ export class AuthService {
     return this.auth(res, user.id);
   }
 
-  @ApiOperation({
-    summary: 'Enter in system',
-    description: 'Autorizazzione del utente e rilascio token',
-  })
   async login(res: Response, dto: LoginRequest) {
     const { email, password } = dto;
 
@@ -78,9 +69,6 @@ export class AuthService {
     return this.auth(res, user.id);
   }
 
-  @ApiOperation({
-    summary: 'Uscita dal sistema',
-  })
   logout(res: Response) {
     this.setCookie(res, '', new Date(0));
     return true;
@@ -94,13 +82,8 @@ export class AuthService {
     return user;
   }
 
-  @ApiOperation({
-    summary: 'Creazione del nuovo token',
-    description: 'Genera un nuovo token',
-  })
   async refresh(req: Request, res: Response) {
     const refreshToken = req.cookies['refreshToken'];
-    console.log(refreshToken);
 
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token non valido');

@@ -11,13 +11,13 @@ model User {
     id String @id @default(uuid())
 
     name     String
-    email    String
+    email    String @unique
     password String
 
     links Link[]
 
     createdAt DateTime @default(now()) @map("created_at")
-    updatedAt DateTime @updatedAt() @map("updated_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
 
     @@map("users")
 }
@@ -28,13 +28,13 @@ model Link {
     originalUrl String @map("original_url")
     shortCode   String @unique @map("short_code")
 
+    clicks Click[]
+
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId String @map("user_id")
 
-    clicks Click[]
-
     createdAt DateTime @default(now()) @map("created_at")
-    updatedAt DateTime @updatedAt() @map("updated_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
 
     @@map("links")
 }
@@ -42,14 +42,14 @@ model Link {
 model Click {
     id String @id @default(uuid())
 
-    ipAdress  String @map("ip_adress")
+    ipAddress String @map("ip_address")
     userAgent String @map("user_agent")
 
-    link   Link   @relation(fields: [linkId], references: [id])
+    link   Link   @relation(fields: [linkId], references: [id], onDelete: Cascade)
     linkId String @map("link_id")
 
     createdAt DateTime @default(now()) @map("created_at")
-    updatedAt DateTime @updatedAt() @map("updated_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
 
     @@map("clicks")
 }
